@@ -89,3 +89,29 @@ li.innerHTML = `
 taskList.appendChild(li);
 });
 }
+
+// Add Task
+taskForm.addEventListener("submit", e => {
+e.preventDefault();
+if (!taskName.value.trim()) return alert("Task name cannot be empty");
+
+
+const newTask = {
+id: Date.now(),
+name: taskName.value.trim(),
+dueDate: taskDate.value,
+status: "Pending"
+};
+tasks.push(newTask);
+taskName.value = "";
+taskDate.value = "";
+renderTasks();
+});
+
+
+// Toggle Complete
+function toggleStatus(id) {
+const task = tasks.find(t => t.id === id);
+task.status = task.status === "Pending" ? "Completed" : "Pending";
+renderTasks();
+}
