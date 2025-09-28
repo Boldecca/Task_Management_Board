@@ -39,4 +39,4 @@ It helps users create, organize, and track tasks efficiently. The app supports t
 
 ## 🌐 Deployment
 
-Live Demo
+Live Demo: https://boldecca.github.io/Task_Management_Board/
