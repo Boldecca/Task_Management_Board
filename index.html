@@ -36,6 +36,16 @@
 </main>
 
 <script>
+    // ===== LocalStorage Helpers =====
+function saveTasks() {
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+}
+
+function loadTasks() {
+  const stored = localStorage.getItem("tasks");
+  return stored ? JSON.parse(stored) : null;
+}
+
 // Sample Initial Tasks
 let tasks = [
 { id: 1, name: "Complete assignment", dueDate: "2025-09-29", status: "Pending" },
