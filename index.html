@@ -30,3 +30,62 @@
 </div>
 <button id="sortBtn" class="px-3 py-1 rounded-lg bg-gray-200 hover:bg-gray-300">Sort by Due Date</button>
 </div>
+
+<!-- Task List -->
+<ul id="taskList" class="space-y-3"></ul>
+</main>
+
+<script>
+// Sample Initial Tasks
+let tasks = [
+{ id: 1, name: "Complete assignment", dueDate: "2025-09-29", status: "Pending" },
+{ id: 2, name: "Team meeting", dueDate: "2025-10-01", status: "Pending" },
+{ id: 3, name: "Buy groceries", dueDate: "2025-09-28", status: "Completed" },
+{ id: 4, name: "Read a book", dueDate: "2025-10-05", status: "Pending" },
+{ id: 5, name: "Workout session", dueDate: "2025-09-30", status: "Pending" }
+];
+
+
+let filterStatus = "all";
+let sortAsc = true;
+
+
+const taskList = document.getElementById("taskList");
+const taskForm = document.getElementById("taskForm");
+const taskName = document.getElementById("taskName");
+const taskDate = document.getElementById("taskDate");
+
+// Render tasks
+function renderTasks() {
+taskList.innerHTML = "";
+let filtered = tasks.filter(task =>
+filterStatus === "all" ? true : task.status.toLowerCase() === filterStatus
+);
+
+
+if (!sortAsc) {
+filtered = filtered.sort((a, b) => new Date(b.dueDate) - new Date(a.dueDate));
+} else {
+filtered = filtered.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+}
+
+
+filtered.forEach(task => {
+const li = document.createElement("li");
+li.className = `flex justify-between items-center p-3 rounded-lg shadow-sm ${task.status === "Completed" ? "bg-green-100" : "bg-white"}`;
+
+
+li.innerHTML = `
+<div>
+<p class="${task.status === "Completed" ? "line-through text-gray-500" : "font-medium"}">${task.name}</p>
+<p class="text-sm text-gray-500">Due: ${task.dueDate}</p>
+</div>
+<div class="space-x-2">
+<button onclick="toggleStatus(${task.id})" class="px-2 py-1 text-xs rounded bg-indigo-500 text-white">${task.status === "Completed" ? "Undo" : "Done"}</button>
+<button onclick="editTask(${task.id})" class="px-2 py-1 text-xs rounded bg-yellow-400">Edit</button>
+<button onclick="deleteTask(${task.id})" class="px-2 py-1 text-xs rounded bg-red-500 text-white">Delete</button>
+</div>
+`;
+taskList.appendChild(li);
+});
+}
