@@ -36,24 +36,14 @@
 </main>
 
 <script>
-    // ===== LocalStorage Helpers =====
-function saveTasks() {
-  localStorage.setItem("tasks", JSON.stringify(tasks));
-}
-
-function loadTasks() {
-  const stored = localStorage.getItem("tasks");
-  return stored ? JSON.parse(stored) : null;
-}
-
-// Sample Initial Tasks (only used if no localStorage)
-let tasks = loadTasks() || [
-{ id: 1, name: "Complete assignment", dueDate: "2025-09-29", status: "Pending" },
-{ id: 2, name: "Team meeting", dueDate: "2025-10-01", status: "Pending" },
-{ id: 3, name: "Buy groceries", dueDate: "2025-09-28", status: "Completed" },
-{ id: 4, name: "Read a book", dueDate: "2025-10-05", status: "Pending" },
-{ id: 5, name: "Workout session", dueDate: "2025-09-30", status: "Pending" }
-];
+// Sample Initial Tasks
+    let tasks = [
+      { id: 1, name: "Complete assignment", dueDate: "2025-09-29", status: "Pending" },
+      { id: 2, name: "Team meeting", dueDate: "2025-10-01", status: "Pending" },
+      { id: 3, name: "Buy groceries", dueDate: "2025-09-28", status: "Completed" },
+      { id: 4, name: "Read a book", dueDate: "2025-10-05", status: "Pending" },
+      { id: 5, name: "Workout session", dueDate: "2025-09-30", status: "Pending" }
+    ];
 
 let filterStatus = "all";
 let sortAsc = true;
@@ -97,8 +87,6 @@ li.innerHTML = `
 `;
 taskList.appendChild(li);
 });
-saveTasks(); // <-- Save to LocalStorage whenever rendering
-
 }
 
 // Add Task
