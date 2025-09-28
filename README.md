@@ -18,13 +18,22 @@ It helps users create, organize, and track tasks efficiently. The app supports t
 - 📱 Fully responsive design (desktop, tablet, mobile) with Tailwind CSS  
 
 ---
+## 🛠 Tech Stack
+- *HTML5*
+- *JavaScript (ES6+)*
+- *Tailwind CSS*
+
+---
+
+## 📷 Screenshots
+![Dashboard Screenshot](![alt text](image.png))
+
+---
 
 ## 🚀 How to Run Locally
 1. Clone the repository:
    ```bash
    git clone https://github.com/Boldecca/Task_Management_Board.git
-
-## 📸 Screenshots
 
 
 
