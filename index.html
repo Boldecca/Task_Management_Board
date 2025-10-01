@@ -28,9 +28,18 @@
     background: rgba(34, 197, 94, 0.15);
     border: 1px solid rgba(34, 197, 94, 0.3);
   }
+  .overdue-task {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    animation: pulse-red 2s infinite;
+  }
   .filter-btn.active {
     background: rgba(99, 102, 241, 0.3);
     border: 1px solid rgba(99, 102, 241, 0.5);
+  }
+  @keyframes pulse-red {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
   }
 </style>
 </head>
@@ -48,6 +57,7 @@
           <span class="glass-effect px-3 py-1 rounded-full text-xs">Total: <span id="totalCount" class="font-semibold">0</span></span>
           <span class="glass-effect px-3 py-1 rounded-full text-xs">Pending: <span id="pendingCount" class="font-semibold text-yellow-300">0</span></span>
           <span class="glass-effect px-3 py-1 rounded-full text-xs">Completed: <span id="completedCount" class="font-semibold text-green-300">0</span></span>
+          <span class="glass-effect px-3 py-1 rounded-full text-xs">Overdue: <span id="overdueCount" class="font-semibold text-red-300">0</span></span>
         </div>
       </div>
     </div>
@@ -120,6 +130,12 @@
           >
             Completed
           </button>
+          <button 
+            data-filter="overdue" 
+            class="filter-btn px-4 py-2 rounded-lg bg-gray-700/50 hover:bg-gray-600/50 text-white transition-all"
+          >
+            Overdue
+          </button>
         </div>
         <button 
           id="sortBtn" 
@@ -142,11 +158,11 @@
 <script>
 // Sample Initial Tasks
     let tasks = [
-      { id: 1, name: "Complete assignment", dueDate: "2025-09-29", status: "Pending" },
-      { id: 2, name: "Team meeting", dueDate: "2025-10-01", status: "Pending" },
-      { id: 3, name: "Buy groceries", dueDate: "2025-09-28", status: "Completed" },
-      { id: 4, name: "Read a book", dueDate: "2025-10-05", status: "Pending" },
-      { id: 5, name: "Workout session", dueDate: "2025-09-30", status: "Pending" }
+      { id: 1, name: "Complete assignment", dueDate: "2024-12-20", status: "Pending" },
+      { id: 2, name: "Team meeting", dueDate: "2024-12-25", status: "Pending" },
+      { id: 3, name: "Buy groceries", dueDate: "2024-12-18", status: "Completed" },
+      { id: 4, name: "Read a book", dueDate: "2024-12-30", status: "Pending" },
+      { id: 5, name: "Workout session", dueDate: "2024-12-15", status: "Pending" }
     ];
 
 let filterStatus = "all";
@@ -158,12 +174,24 @@ const taskForm = document.getElementById("taskForm");
 const taskName = document.getElementById("taskName");
 const taskDate = document.getElementById("taskDate");
 
+// Helper function to check if a task is overdue
+function isOverdue(task) {
+  if (task.status === "Completed") return false;
+  const today = new Date();
+  const dueDate = new Date(task.dueDate);
+  today.setHours(0, 0, 0, 0);
+  dueDate.setHours(0, 0, 0, 0);
+  return dueDate < today;
+}
+
 // Render tasks
 function renderTasks() {
   taskList.innerHTML = "";
-  let filtered = tasks.filter(task =>
-    filterStatus === "all" ? true : task.status.toLowerCase() === filterStatus
-  );
+  let filtered = tasks.filter(task => {
+    if (filterStatus === "all") return true;
+    if (filterStatus === "overdue") return isOverdue(task);
+    return task.status.toLowerCase() === filterStatus;
+  });
 
   if (!sortAsc) {
     filtered = filtered.sort((a, b) => new Date(b.dueDate) - new Date(a.dueDate));
@@ -173,16 +201,49 @@ function renderTasks() {
 
   filtered.forEach(task => {
     const li = document.createElement("li");
-    li.className = `task-card flex justify-between items-center p-6 rounded-2xl shadow-lg ${task.status === "Completed" ? "completed-task" : ""}`;
+    const overdue = isOverdue(task);
+    const completed = task.status === "Completed";
+    
+    let cardClass = "task-card flex justify-between items-center p-6 rounded-2xl shadow-lg";
+    if (completed) cardClass += " completed-task";
+    else if (overdue) cardClass += " overdue-task";
+    
+    li.className = cardClass;
+
+    // Calculate days until due or days overdue
+    const today = new Date();
+    const dueDate = new Date(task.dueDate);
+    const diffTime = dueDate - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    let dueText = `Due: ${task.dueDate}`;
+    let dueClass = "text-sm text-gray-400 mt-1";
+    
+    if (overdue) {
+      dueText = `Overdue by ${Math.abs(diffDays)} day${Math.abs(diffDays) !== 1 ? 's' : ''}`;
+      dueClass = "text-sm text-red-400 mt-1 font-semibold";
+    } else if (diffDays === 0) {
+      dueText = "Due: Today";
+      dueClass = "text-sm text-yellow-400 mt-1 font-semibold";
+    } else if (diffDays === 1) {
+      dueText = "Due: Tomorrow";
+      dueClass = "text-sm text-yellow-300 mt-1";
+    } else if (diffDays <= 3) {
+      dueText = `Due in ${diffDays} days`;
+      dueClass = "text-sm text-yellow-300 mt-1";
+    }
 
     li.innerHTML = `
       <div class="flex-1">
-        <p class="${task.status === "Completed" ? "line-through text-gray-400" : "font-semibold text-white text-lg"}">${task.name}</p>
-        <p class="text-sm text-gray-400 mt-1">Due: ${task.dueDate}</p>
+        <div class="flex items-center gap-2">
+          <p class="${completed ? "line-through text-gray-400" : "font-semibold text-white text-lg"}">${task.name}</p>
+          ${overdue ? '<span class="px-2 py-1 text-xs bg-red-500/20 text-red-300 rounded-full border border-red-500/30">OVERDUE</span>' : ''}
+        </div>
+        <p class="${dueClass}">${dueText}</p>
       </div>
       <div class="flex space-x-3">
         <button onclick="toggleStatus(${task.id})" class="px-4 py-2 text-sm rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 transform hover:scale-105 transition-all font-medium shadow-lg">
-          ${task.status === "Completed" ? "Undo" : "Done"}
+          ${completed ? "Undo" : "Done"}
         </button>
         <button onclick="editTask(${task.id})" class="px-4 py-2 text-sm rounded-xl bg-gradient-to-r from-yellow-500 to-yellow-600 text-white hover:from-yellow-600 hover:to-yellow-700 transform hover:scale-105 transition-all font-medium shadow-lg">
           Edit
@@ -274,16 +335,19 @@ renderTasks();
 function updateHeaderStats() {
   const total = tasks.length;
   const completed = tasks.filter(t => t.status === "Completed").length;
+  const overdue = tasks.filter(t => isOverdue(t)).length;
   const pending = total - completed;
 
   const totalEl = document.getElementById("totalCount");
   const pendingEl = document.getElementById("pendingCount");
   const completedEl = document.getElementById("completedCount");
+  const overdueEl = document.getElementById("overdueCount");
   const dateEl = document.getElementById("currentDate");
 
   if (totalEl) totalEl.textContent = String(total);
   if (pendingEl) pendingEl.textContent = String(pending);
   if (completedEl) completedEl.textContent = String(completed);
+  if (overdueEl) overdueEl.textContent = String(overdue);
   if (dateEl) {
     const now = new Date();
     const formatted = now.toLocaleDateString(undefined, { weekday: "short", year: "numeric", month: "short", day: "2-digit" });
