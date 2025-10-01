@@ -158,9 +158,9 @@
 <script>
 // Sample Initial Tasks
     let tasks = [
-      { id: 1, name: "Complete assignment", dueDate: "2024-12-20", status: "Pending" },
+      { id: 1, name: "Complete assignment", dueDate: "2025-09-20", status: "completed" },
       { id: 2, name: "Team meeting", dueDate: "2024-12-25", status: "Pending" },
-      { id: 3, name: "Buy groceries", dueDate: "2025-12-18", status: "Completed" },
+      { id: 3, name: "Buy groceries", dueDate: "2025-12-18", status: "pending" },
       { id: 4, name: "Read a book", dueDate: "2025-12-30", status: "Pending" },
       { id: 5, name: "Workout session", dueDate: "2025-12-15", status: "Pending" }
     ];
@@ -174,9 +174,18 @@ const taskForm = document.getElementById("taskForm");
 const taskName = document.getElementById("taskName");
 const taskDate = document.getElementById("taskDate");
 
+// Helper functions for task status and dates
+function isCompleted(task) {
+  return String(task.status).toLowerCase() === "completed";
+}
+
+function isPending(task) {
+  return !isCompleted(task);
+}
+
 // Helper function to check if a task is overdue
 function isOverdue(task) {
-  if (task.status === "Completed") return false;
+  if (isCompleted(task)) return false;
   const today = new Date();
   const dueDate = new Date(task.dueDate);
   today.setHours(0, 0, 0, 0);
@@ -190,7 +199,7 @@ function renderTasks() {
   let filtered = tasks.filter(task => {
     if (filterStatus === "all") return true;
     if (filterStatus === "overdue") return isOverdue(task);
-    return task.status.toLowerCase() === filterStatus;
+    return String(task.status).toLowerCase() === filterStatus;
   });
 
   if (!sortAsc) {
@@ -202,7 +211,7 @@ function renderTasks() {
   filtered.forEach(task => {
     const li = document.createElement("li");
     const overdue = isOverdue(task);
-    const completed = task.status === "Completed";
+    const completed = isCompleted(task);
     
     let cardClass = "task-card flex justify-between items-center p-6 rounded-2xl shadow-lg";
     if (completed) cardClass += " completed-task";
@@ -280,9 +289,11 @@ renderTasks();
 
 // Toggle Complete
 function toggleStatus(id) {
-const task = tasks.find(t => t.id === id);
-task.status = task.status === "Pending" ? "Completed" : "Pending";
-renderTasks();
+  const task = tasks.find(t => t.id === id);
+  if (!task) return;
+  const current = String(task.status).toLowerCase();
+  task.status = current === "pending" ? "Completed" : "Pending";
+  renderTasks();
 }
 
 
@@ -334,7 +345,7 @@ renderTasks();
 // Header stats & date
 function updateHeaderStats() {
   const total = tasks.length;
-  const completed = tasks.filter(t => t.status === "Completed").length;
+  const completed = tasks.filter(t => isCompleted(t)).length;
   const overdue = tasks.filter(t => isOverdue(t)).length;
   const pending = total - completed;
 
