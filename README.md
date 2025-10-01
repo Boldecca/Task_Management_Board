@@ -26,7 +26,7 @@ It helps users create, organize, and track tasks efficiently. The app supports t
 ---
 
 ## 📷 Screenshots
-![Dashboard Screenshot](![alt text](image-1.png))
+![Dashboard Screenshot](![alt text](image-2.png))
 
 ---
 
